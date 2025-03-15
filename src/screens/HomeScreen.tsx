@@ -1,9 +1,11 @@
 import React from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-
-export default function HomeScreen() {
+interface HomeScreenProps {
+    activeIndex: number;
+}
+export default function HomeScreen({ activeIndex }: HomeScreenProps) {
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             {/* En-tête : Titre et Description */}
             <View style={styles.header}>
                 <Text style={styles.title}>Find Your Music</Text>
@@ -41,21 +43,21 @@ export default function HomeScreen() {
 
             {/* Indicateurs de Navigation */}
             <View style={styles.pagination}>
-                <View style={[styles.paginationDot, styles.activeDot]} />
-                <View style={styles.paginationDot} />
-                <View style={styles.paginationDot} />
+                <View style={[styles.paginationDot, activeIndex === 0 ? styles.activeDot : styles.inactiveDot]} />
+                <View style={[styles.paginationDot, activeIndex === 1 ? styles.activeDot : styles.inactiveDot]} />
+                <View style={[styles.paginationDot, activeIndex === 2 ? styles.activeDot : styles.inactiveDot]} />
             </View>
-        </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         backgroundColor: "#000",
         alignItems: "center",
-        justifyContent: "center",
         paddingTop: 50,
+        paddingBottom: 20,
     },
     header: {
         alignItems: "center",
@@ -70,22 +72,25 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "#b3b3b3",
         marginTop: 5,
+        textAlign: "center",
+        paddingHorizontal: 20,
     },
     searchInput: {
-        width: "80%",
+        width: "85%",
         height: 50,
         backgroundColor: "#fff",
         borderRadius: 25,
         paddingLeft: 20,
-        marginBottom: 30,
         fontSize: 16,
         color: "#000",
+        marginBottom: 30,
     },
     buttonsContainer: {
         flexDirection: "row",
         justifyContent: "space-around",
         width: "100%",
         marginBottom: 20,
+        paddingHorizontal: 10,
     },
     button: {
         justifyContent: "center",
@@ -93,7 +98,7 @@ const styles = StyleSheet.create({
         width: 120,
         height: 120,
         borderRadius: 60,
-        marginHorizontal: 10
+        marginHorizontal: 10,
     },
     buttonText: {
         fontSize: 18,
@@ -104,6 +109,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: "#333",
         marginTop: 5,
+        textAlign: "center",
     },
     newSong: {
         backgroundColor: "#FFC107",
@@ -118,19 +124,25 @@ const styles = StyleSheet.create({
         backgroundColor: "#FFC107",
     },
     pagination: {
+        position: "absolute",
+        bottom: 20,
         flexDirection: "row",
-        marginBottom: 20,
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
     },
     paginationDot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: "#fff",
+        width: 12,
+        height: 12,
+        borderRadius: 6,
         marginHorizontal: 5,
     },
     activeDot: {
+        backgroundColor: "#FFD700",
         width: 14,
         height: 14,
-        backgroundColor: "#FFD700",
+    },
+    inactiveDot: {
+        backgroundColor: "#fff",
     },
 });

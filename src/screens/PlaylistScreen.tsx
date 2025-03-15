@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import * as MediaLibrary from "expo-media-library";
 import { AudioContext } from "../context/AudioContext";
-
-const PlaylistScreen = () => {
+interface PlayListScreenProps {
+    activeIndex: number;
+}
+const PlaylistScreen = ({ activeIndex }:PlayListScreenProps) => {
     const { permissionGranted } = useContext(AudioContext);
     const [audioFiles, setAudioFiles] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (permissionGranted) {
@@ -15,36 +18,47 @@ const PlaylistScreen = () => {
 
     const getAudioFiles = async () => {
         try {
-            const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== "granted") {
-                Alert.alert("Permission refusée", "Impossible d'accéder aux fichiers audio.");
-                return;
-            }
-            //  récupère uniquement les fichiers audio et limité le nombre maximum de fichiers récupérés
+            setLoading(true);
             let media = await MediaLibrary.getAssetsAsync({
                 mediaType: "audio",
                 first: 1000,
             });
-            // Stocke la liste des fichiers audio
+
             setAudioFiles(media.assets);
         } catch (error) {
             console.error("Erreur lors de la récupération des fichiers audio", error);
             Alert.alert("Erreur", "Une erreur est survenue lors de la récupération des fichiers audio.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>🎶 Musiques Locales</Text>
-            <FlatList
-                data={audioFiles}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity style={styles.audioItem}>
-                        <Text style={styles.audioTitle}>{item.filename}</Text>
-                    </TouchableOpacity>
-                )}
-            />
+            <Text style={styles.title}>🎶 Local music</Text>
+
+            {loading ? (
+                <ActivityIndicator size="large" color="#FFD700" />
+            ) : audioFiles.length === 0 ? (
+                <Text style={styles.noMusicText}>No music found.</Text>
+            ) : (
+                <FlatList
+                    data={audioFiles}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity style={styles.audioItem}>
+                            <Text style={styles.audioTitle}>{item.filename}</Text>
+                        </TouchableOpacity>
+                    )}
+                />
+            )}
+
+            {/* Indicateurs de Navigation */}
+            <View style={styles.pagination}>
+                <View style={[styles.paginationDot, activeIndex === 0 ? styles.inactiveDot : styles.inactiveDot]} />
+                <View style={[styles.paginationDot, activeIndex === 1 ? styles.activeDot : styles.inactiveDot]} />
+                <View style={[styles.paginationDot, activeIndex === 2 ? styles.inactiveDot : styles.inactiveDot]} />
+            </View>
         </View>
     );
 };
@@ -62,6 +76,12 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: "center",
     },
+    noMusicText: {
+        color: "#b3b3b3",
+        fontSize: 16,
+        textAlign: "center",
+        marginTop: 20,
+    },
     audioItem: {
         backgroundColor: "#222",
         padding: 15,
@@ -71,6 +91,28 @@ const styles = StyleSheet.create({
     audioTitle: {
         color: "#FFF",
         fontSize: 16,
+    },
+    pagination: {
+        position: "absolute",
+        bottom: 20,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+    },
+    paginationDot: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        marginHorizontal: 5,
+    },
+    activeDot: {
+        backgroundColor: "#FFD700",
+        width: 14,
+        height: 14,
+    },
+    inactiveDot: {
+        backgroundColor: "#fff",
     },
 });
 
