@@ -1,41 +1,25 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from "react-native";
-import * as MediaLibrary from "expo-media-library";
+import React, { useEffect, useContext, useState } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import { AudioContext } from "../context/AudioContext";
-interface PlayListScreenProps {
+
+interface PlaylistScreenProps {
     activeIndex: number;
+    onSelectAudio: (audio: any) => void; // Fonction pour gérer la sélection d'un fichier audio
 }
-const PlaylistScreen = ({ activeIndex }:PlayListScreenProps) => {
-    const { permissionGranted } = useContext(AudioContext);
-    const [audioFiles, setAudioFiles] = useState<any[]>([]);
+
+const PlaylistScreen = ({ activeIndex, onSelectAudio }: PlaylistScreenProps) => {
+    const { audioFiles, permissionGranted } = useContext(AudioContext);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (permissionGranted) {
-            getAudioFiles();
-        }
-    }, [permissionGranted]);
-
-    const getAudioFiles = async () => {
-        try {
-            setLoading(true);
-            let media = await MediaLibrary.getAssetsAsync({
-                mediaType: "audio",
-                first: 1000,
-            });
-
-            setAudioFiles(media.assets);
-        } catch (error) {
-            console.error("Erreur lors de la récupération des fichiers audio", error);
-            Alert.alert("Erreur", "Une erreur est survenue lors de la récupération des fichiers audio.");
-        } finally {
             setLoading(false);
         }
-    };
+    }, [audioFiles]);
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>🎶 Local music</Text>
+            <Text style={styles.title}>🎶 Local Music</Text>
 
             {loading ? (
                 <ActivityIndicator size="large" color="#FFD700" />
@@ -46,7 +30,7 @@ const PlaylistScreen = ({ activeIndex }:PlayListScreenProps) => {
                     data={audioFiles}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.audioItem}>
+                        <TouchableOpacity style={styles.audioItem} onPress={() => onSelectAudio(item)}>
                             <Text style={styles.audioTitle}>{item.filename}</Text>
                         </TouchableOpacity>
                     )}

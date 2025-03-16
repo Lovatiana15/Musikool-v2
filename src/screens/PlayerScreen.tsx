@@ -1,49 +1,127 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Slider from "@react-native-community/slider";
 import { Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
+import { AudioContext } from "../context/AudioContext";
+
 interface PlayerScreenProps {
     activeIndex: number;
 }
+
 const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {
+    const { audioFiles } = useContext(AudioContext);
+    const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(240);
+    const [duration, setDuration] = useState(1);
+    const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
 
-    const togglePlayPause = () => {
-        setIsPlaying(!isPlaying);
+    useEffect(() => {
+        loadAndPlayAudio(currentTrackIndex);
+        return () => {
+            if (sound) {
+                sound.unloadAsync();
+            }
+        };
+    }, []);
+
+    const loadAndPlayAudio = async (index: number) => {
+        if (audioFiles.length === 0) return;
+
+        try {
+            if (sound) {
+                await sound.unloadAsync();
+            }
+
+            const { sound: newSound, status } = await Audio.Sound.createAsync(
+                { uri: audioFiles[index].uri },
+                { shouldPlay: true },
+                onPlaybackStatusUpdate
+            );
+
+            setSound(newSound);
+            setIsPlaying(true);
+            setDuration(status.durationMillis || 1);
+            setCurrentTrackIndex(index);
+        } catch (error) {
+            console.log("Erreur lors du chargement de l'audio :", error);
+        }
     };
 
-    const handleSliderChange = (value: number) => {
-        setCurrentTime(value);
+    const onPlaybackStatusUpdate = (status: any) => {
+        if (status.isLoaded) {
+            setCurrentTime(status.positionMillis || 0);
+            setDuration(status.durationMillis || 1);
+            setIsPlaying(status.isPlaying);
+
+            if (status.didJustFinish) {
+                playNextTrack();
+            }
+        } else {
+            console.log("Audio non chargé :", status);
+        }
+    };
+
+    const togglePlayPause = async () => {
+        if (!sound) {
+            await loadAndPlayAudio(currentTrackIndex);
+            return;
+        }
+
+        try {
+            if (isPlaying) {
+                await sound.pauseAsync();
+            } else {
+                await sound.playAsync();
+            }
+            setIsPlaying(!isPlaying);
+        } catch (error) {
+            console.log("Erreur lors du changement de lecture :", error);
+        }
+    };
+
+    const playNextTrack = () => {
+        if (audioFiles.length === 0) return;
+        const nextIndex = (currentTrackIndex + 1) % audioFiles.length;
+        loadAndPlayAudio(nextIndex);
+    };
+
+    const playPreviousTrack = () => {
+        if (audioFiles.length === 0) return;
+        const prevIndex = currentTrackIndex - 1 < 0 ? audioFiles.length - 1 : currentTrackIndex - 1;
+        loadAndPlayAudio(prevIndex);
+    };
+
+    const handleSliderChange = async (value: number) => {
+        if (sound) {
+            await sound.setPositionAsync(value);
+        }
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>🎵 Music title</Text>
-            <Text style={styles.artist}>Unknown artist</Text>
+            <Text style={styles.title}>{audioFiles[currentTrackIndex]?.filename || "No Track"}</Text>
+            <Text style={styles.artist}>Unknown Artist</Text>
 
-            {/* Affichage du temps */}
             <View style={styles.timeContainer}>
                 <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
                 <Text style={styles.timeText}>{formatTime(duration)}</Text>
             </View>
 
-            {/* Slider de progression */}
             <Slider
                 style={styles.slider}
                 minimumValue={0}
                 maximumValue={duration}
                 value={currentTime}
-                onValueChange={handleSliderChange}
+                onSlidingComplete={handleSliderChange}
                 minimumTrackTintColor="#FFD700"
                 maximumTrackTintColor="#b3b3b3"
                 thumbTintColor="#FFD700"
             />
 
-            {/* Contrôles */}
             <View style={styles.controls}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={playPreviousTrack}>
                     <Ionicons name="play-skip-back-outline" size={40} color="white" />
                 </TouchableOpacity>
 
@@ -51,12 +129,11 @@ const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {
                     <Ionicons name={isPlaying ? "pause-circle" : "play-circle"} size={80} color="#FFD700" />
                 </TouchableOpacity>
 
-                <TouchableOpacity>
+                <TouchableOpacity onPress={playNextTrack}>
                     <Ionicons name="play-skip-forward-outline" size={40} color="white" />
                 </TouchableOpacity>
             </View>
 
-            {/* Indicateurs de navigation */}
             <View style={styles.pagination}>
                 <View style={[styles.paginationDot, activeIndex === 0 ? styles.activeDot : styles.inactiveDot]} />
                 <View style={[styles.paginationDot, activeIndex === 1 ? styles.activeDot : styles.inactiveDot]} />
@@ -66,10 +143,9 @@ const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {
     );
 };
 
-// Formater le temps de manière lisible
 const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
+    const minutes = Math.floor(time / 60000);
+    const seconds = Math.floor((time % 60000) / 1000);
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 };
 
