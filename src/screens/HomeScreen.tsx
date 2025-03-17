@@ -33,12 +33,6 @@ export default function HomeScreen({ activeIndex }: HomeScreenProps) {
                 </TouchableOpacity>
             </View>
 
-            {/* Indicateurs de Navigation */}
-            <View style={styles.pagination}>
-                <View style={[styles.paginationDot, activeIndex === 0 ? styles.activeDot : styles.inactiveDot]} />
-                <View style={[styles.paginationDot, activeIndex === 1 ? styles.activeDot : styles.inactiveDot]} />
-                <View style={[styles.paginationDot, activeIndex === 2 ? styles.activeDot : styles.inactiveDot]} />
-            </View>
         </ScrollView>
     );
 }

@@ -1,140 +1,181 @@
-import React, { useEffect, useContext, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, TextInput } from "react-native";
-import { AudioContext } from "../context/AudioContext";
+import React, { useState } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TextInput } from "react-native";
+import { usePlaylist } from "../context/PlaylistContext";
 import { useNavigation } from "@react-navigation/native";
 
-interface PlaylistScreenProps {
-    activeIndex?: number;
-}
+const PlaylistScreen = () => {
+  const { playlists, setPlaylists } = usePlaylist();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState("");
+  const navigation = useNavigation();
 
-const PlaylistScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
-    const { audioFiles } = useContext(AudioContext);
-    const [loading, setLoading] = useState(true);
-    const [searchText, setSearchText] = useState(""); // Etat pour le texte de recherche
-    const [filteredAudioFiles, setFilteredAudioFiles] = useState(audioFiles); // Etat pour les fichiers audio filtrés
-    const navigation = useNavigation();
+  const addNewPlaylist = () => {
+    if (newPlaylistName.trim() === "") return;
+    const newPlaylist = {
+      id: Date.now().toString(),
+      name: newPlaylistName,
+      songs: [],
+    };
+    setPlaylists([...playlists, newPlaylist]);
+    setNewPlaylistName("");
+    setModalVisible(false);
+  };
 
-    useEffect(() => {
-        if (audioFiles.length > 0) {
-            setLoading(false);
-        }
-    }, [audioFiles]);
+  const deletePlaylist = (playlistId: string) => {
+    setPlaylists(playlists.filter(pl => pl.id !== playlistId));
+  };
 
-    // Filtrer les fichiers audio en fonction du texte de recherche
-    useEffect(() => {
-        if (searchText === "") {
-            setFilteredAudioFiles(audioFiles);
-        } else {
-            const filtered = audioFiles.filter(item =>
-                item.filename.toLowerCase().includes(searchText.toLowerCase())
-            );
-            setFilteredAudioFiles(filtered);
-        }
-    }, [searchText, audioFiles]);
+  const openPlaylist = (playlist: any) => {
+    navigation.navigate("PlaylistDetail", { playlistId: playlist.id });
+  };
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>🎶 Local Music</Text>
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Mes Playlists</Text>
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+        <Text style={styles.buttonText}>Ajouter une nouvelle playlist</Text>
+      </TouchableOpacity>
 
-            {/* Champ de Recherche */}
+      <FlatList
+        data={playlists}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.playlistItem} onPress={() => openPlaylist(item)}>
+            <Text style={styles.playlistName}>{item.name}</Text>
+            <TouchableOpacity style={styles.deleteButton} onPress={() => deletePlaylist(item.id)}>
+              <Text style={styles.deleteButtonText}>Effacer</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        )}
+        ListEmptyComponent={<Text style={styles.emptyText}>Aucune playlist créée.</Text>}
+      />
+
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Nouvelle Playlist</Text>
             <TextInput
-                style={styles.searchInput}
-                placeholder="Search Songs..."
-                placeholderTextColor="#b3b3b3"
-                value={searchText}
-                onChangeText={setSearchText} // Mettre à jour l'état du texte de recherche
+              style={styles.modalInput}
+              placeholder="Nom de la playlist"
+              placeholderTextColor="#999"
+              value={newPlaylistName}
+              onChangeText={setNewPlaylistName}
             />
-
-            {loading ? (
-                <ActivityIndicator size="large" color="#FFD700" />
-            ) : filteredAudioFiles.length === 0 ? (
-                <Text style={styles.noMusicText}>No music found.</Text>
-            ) : (
-                <FlatList
-                    data={filteredAudioFiles}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item, index }) => (
-                        <TouchableOpacity
-                            style={styles.audioItem}
-                            onPress={() => navigation.navigate("Player", { trackIndex: index })}
-                        >
-                            <Text style={styles.audioTitle}>{item.filename}</Text>
-                        </TouchableOpacity>
-                    )}
-                />
-            )}
-
-            {/* Indicateurs de Navigation */}
-            <View style={styles.pagination}>
-                <View style={[styles.paginationDot, activeIndex === 0 ? styles.inactiveDot : styles.inactiveDot]} />
-                <View style={[styles.paginationDot, activeIndex === 1 ? styles.activeDot : styles.inactiveDot]} />
-                <View style={[styles.paginationDot, activeIndex === 2 ? styles.inactiveDot : styles.inactiveDot]} />
+            <View style={styles.modalButtons}>
+                <TouchableOpacity
+                    style={[styles.modalButton, styles.cancelButton]}
+                    onPress={() => setModalVisible(false)}
+                >
+                    <Text style={styles.modalButtonText}>Annuler</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={addNewPlaylist}>
+                    <Text style={styles.modalButtonText}>Créer</Text>
+                </TouchableOpacity>
             </View>
+          </View>
         </View>
-    );
+      </Modal>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#000",
-        padding: 20
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: "#FFD700",
-        marginBottom: 20,
-        textAlign: "center"
-    },
-    searchInput: {
-        width: "85%",
-        height: 50,
-        backgroundColor: "#fff",
-        borderRadius: 25,
-        paddingLeft: 20,
-        fontSize: 16,
-        color: "#000",
-        marginBottom: 20, // Ajouter un espacement pour le champ de recherche
-    },
-    noMusicText: {
-        color: "#b3b3b3",
-        fontSize: 16,
-        textAlign: "center",
-        marginTop: 20
-    },
-    audioItem: {
-        backgroundColor: "#222",
-        padding: 15,
-        marginVertical: 8,
-        borderRadius: 8
-    },
-    audioTitle: {
-        color: "#FFF",
-        fontSize: 16
-    },
-    pagination: {
-        position: "absolute",
-        bottom: 20,
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%"
-    },
-    paginationDot: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        marginHorizontal: 5
-    },
-    activeDot: {
-        backgroundColor: "#FFD700",
-        width: 14,
-        height: 14
-    },
-    inactiveDot: {
-        backgroundColor: "#fff"
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#000",
+    padding: 20,
+  },
+  header: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#FFD700",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  addButton: {
+    backgroundColor: "gray",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  playlistItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#222",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  playlistName: {
+    color: "#FFF",
+    fontSize: 16,
+  },
+  deleteButton: {
+    backgroundColor: "#FF4500",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  deleteButtonText: {
+    color: "#FFF",
+    fontSize: 14,
+  },
+  emptyText: {
+    color: "#b3b3b3",
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    width: "80%",
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  modalButton: {
+    backgroundColor: "#1E90FF",
+    padding: 10,
+    borderRadius: 5,
+    width: "40%",
+    alignItems: "center",
+  },
+  cancelButton: {
+    backgroundColor: "#FF4500",
+  },
+  modalButtonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+  },
 });
 
 export default PlaylistScreen;

@@ -3,18 +3,20 @@ import { View } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from "../screens/HomeScreen";
-import PlaylistScreen from "../screens/PlaylistScreen";
+import ListScreen from "../screens/ListScreen";
 import PlayerScreen from "../screens/PlayerScreen";
+import PlaylistScreen from "../screens/PlaylistScreen";
+import FavoriteScreen from "../screens/FavoriteScreen";
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function TabLayout() {
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 , marginTop:25}}>
       <Tab.Navigator
         screenOptions={{
           tabBarStyle: { backgroundColor: "gray" },
-          tabBarLabelStyle: { color: "white", fontSize: 16 },
+          tabBarLabelStyle: { color: "white", fontSize: 12 },
           tabBarIndicatorStyle: { backgroundColor: "yellow", height: 3 },
         }}
       >
@@ -23,7 +25,25 @@ export default function TabLayout() {
           component={HomeScreen}
           options={{
             tabBarLabel: "Home",
-            tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={20} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={25} color={color} />,
+          }}
+        />
+        
+        <Tab.Screen
+          name="List"
+          component={ListScreen}
+          options={{
+            tabBarLabel: "Music",
+            tabBarIcon: ({ color }) => <Ionicons name="musical-notes-outline" size={25} color={color} />,
+          }}
+        />
+
+        <Tab.Screen
+          name="Player"
+          component={PlayerScreen}
+          options={{
+            tabBarLabel: "Play",
+            tabBarIcon: ({ color }) => <Ionicons name="play-circle-outline" size={25} color={color} />,
           }}
         />
         <Tab.Screen
@@ -31,15 +51,15 @@ export default function TabLayout() {
           component={PlaylistScreen}
           options={{
             tabBarLabel: "Playlist",
-            tabBarIcon: ({ color }) => <Ionicons name="musical-notes-outline" size={20} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons name="list-outline" size={25} color={color} />,
           }}
         />
         <Tab.Screen
-          name="Player"
-          component={PlayerScreen}
+          name="Favorite"
+          component={FavoriteScreen}
           options={{
-            tabBarLabel: "Player",
-            tabBarIcon: ({ color }) => <Ionicons name="play-circle-outline" size={20} color={color} />,
+            tabBarLabel: "Favorite",
+            tabBarIcon: ({ color }) => <Ionicons name="heart" size={25} color={color} />,
           }}
         />
       </Tab.Navigator>
