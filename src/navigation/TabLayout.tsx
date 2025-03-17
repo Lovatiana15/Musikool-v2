@@ -3,8 +3,10 @@ import { View } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from "../screens/HomeScreen";
-import PlaylistScreen from "../screens/PlaylistScreen";
+import ListScreen from "../screens/ListScreen";
 import PlayerScreen from "../screens/PlayerScreen";
+import PlaylistScreen from "../screens/PlaylistScreen";
+import FavoriteScreen from "../screens/FavoriteScreen";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -14,10 +16,26 @@ export default function TabLayout() {
       <Tab.Navigator
         screenOptions={{
           tabBarStyle: { backgroundColor: "gray" },
-          tabBarLabelStyle: { color: "white", fontSize: 16 },
+          tabBarLabelStyle: { color: "white", fontSize: 14 },
           tabBarIndicatorStyle: { backgroundColor: "yellow", height: 3 },
         }}
       >
+        <Tab.Screen
+          name="Playlist"
+          component={PlaylistScreen}
+          options={{
+            tabBarLabel: "Playlist",
+            tabBarIcon: ({ color }) => <Ionicons name="list-outline" size={20} color={color} />,
+          }}
+        />
+        <Tab.Screen
+          name="Favorite"
+          component={FavoriteScreen}
+          options={{
+            tabBarLabel: "Favorite",
+            tabBarIcon: ({ color }) => <Ionicons name="heart" size={20} color={color} />,
+          }}
+        />
         <Tab.Screen
           name="Home"
           component={HomeScreen}
@@ -27,13 +45,14 @@ export default function TabLayout() {
           }}
         />
         <Tab.Screen
-          name="Playlist"
-          component={PlaylistScreen}
+          name="List"
+          component={ListScreen}
           options={{
-            tabBarLabel: "Playlist",
+            tabBarLabel: "Music",
             tabBarIcon: ({ color }) => <Ionicons name="musical-notes-outline" size={20} color={color} />,
           }}
         />
+
         <Tab.Screen
           name="Player"
           component={PlayerScreen}
