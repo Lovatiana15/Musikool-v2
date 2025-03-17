@@ -31,9 +31,9 @@ const PlaylistScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Mes Playlists</Text>
+      <Text style={styles.header}>My Playlists</Text>
       <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
-        <Text style={styles.buttonText}>Ajouter une nouvelle playlist</Text>
+        <Text style={styles.buttonText}>Add new playlist</Text>
       </TouchableOpacity>
 
       <FlatList
@@ -43,7 +43,7 @@ const PlaylistScreen = () => {
           <TouchableOpacity style={styles.playlistItem} onPress={() => openPlaylist(item)}>
             <Text style={styles.playlistName}>{item.name}</Text>
             <TouchableOpacity style={styles.deleteButton} onPress={() => deletePlaylist(item.id)}>
-              <Text style={styles.deleteButtonText}>Effacer</Text>
+              <Text style={styles.deleteButtonText}>Delete</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         )}
