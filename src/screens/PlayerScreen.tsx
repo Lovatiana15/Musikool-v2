@@ -7,7 +7,7 @@ import { AudioContext } from "../context/AudioContext";
 import { useRoute } from "@react-navigation/native";
 
 interface PlayerScreenProps {
-    activeIndex: number;
+    activeIndex?: number;
 }
 
 const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {

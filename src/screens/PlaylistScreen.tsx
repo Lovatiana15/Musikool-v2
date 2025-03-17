@@ -3,7 +3,11 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator }
 import { AudioContext } from "../context/AudioContext";
 import { useNavigation } from "@react-navigation/native";
 
-const PlaylistScreen = ({ activeIndex }: { activeIndex: number }) => {
+interface PlaylistScreenProps {
+    activeIndex?: number;
+}
+
+const PlaylistScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
     const { audioFiles } = useContext(AudioContext);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation();

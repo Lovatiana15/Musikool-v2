@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 interface HomeScreenProps {
-    activeIndex: number;
+    activeIndex?: number;
 }
 export default function HomeScreen({ activeIndex }: HomeScreenProps) {
     return (
