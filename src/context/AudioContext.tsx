@@ -1,44 +1,38 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
 import * as MediaLibrary from "expo-media-library";
-import { Alert } from "react-native";
 
-// Typage des données dans le contexte
-export const AudioContext = createContext<{
-    audioFiles: MediaLibrary.Asset[];
-    permissionGranted: boolean;
-}>({
-    audioFiles: [],
-    permissionGranted: false,
-});
-
-interface AudioProviderProps {
-    children: React.ReactNode;
+interface AudioFile {
+    uri: string;
+    filename: string;
 }
 
-export default function AudioProvider({ children }: AudioProviderProps) {
-    const [audioFiles, setAudioFiles] = useState<MediaLibrary.Asset[]>([]);
-    const [permissionGranted, setPermissionGranted] = useState(false);
+interface AudioContextType {
+    audioFiles: AudioFile[];
+    setAudioFiles: React.Dispatch<React.SetStateAction<AudioFile[]>>;
+}
+
+export const AudioContext = createContext<AudioContextType | undefined>(undefined);
+
+const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
 
     useEffect(() => {
-        getAudioFiles();
+        const loadAudioFiles = async () => {
+            const { status } = await MediaLibrary.requestPermissionsAsync();
+            if (status !== "granted") return;
+
+            const media = await MediaLibrary.getAssetsAsync({ mediaType: "audio", first: 100 });
+            setAudioFiles(media.assets.map((asset) => ({ uri: asset.uri, filename: asset.filename })));
+        };
+
+        loadAudioFiles();
     }, []);
 
-    const getAudioFiles = async () => {
-        const { status } = await MediaLibrary.requestPermissionsAsync();
-        if (status !== "granted") {
-            Alert.alert("Permission refusée", "L'application a besoin d'accéder aux fichiers audio.");
-            return;
-        }
-
-        setPermissionGranted(true);
-
-        let media = await MediaLibrary.getAssetsAsync({ mediaType: "audio", first: 100 });
-        setAudioFiles(media.assets);
-    };
-
     return (
-        <AudioContext.Provider value={{ audioFiles, permissionGranted }}>
+        <AudioContext.Provider value={{ audioFiles, setAudioFiles }}>
             {children}
         </AudioContext.Provider>
     );
-}
+};
+
+export default AudioProvider;

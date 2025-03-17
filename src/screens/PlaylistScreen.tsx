@@ -1,18 +1,15 @@
 import React, { useEffect, useContext, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import { AudioContext } from "../context/AudioContext";
+import { useNavigation } from "@react-navigation/native";
 
-interface PlaylistScreenProps {
-    activeIndex: number;
-    onSelectAudio: (audio: any) => void; // Fonction pour gérer la sélection d'un fichier audio
-}
-
-const PlaylistScreen = ({ activeIndex, onSelectAudio }: PlaylistScreenProps) => {
-    const { audioFiles, permissionGranted } = useContext(AudioContext);
+const PlaylistScreen = ({ activeIndex }: { activeIndex: number }) => {
+    const { audioFiles } = useContext(AudioContext);
     const [loading, setLoading] = useState(true);
+    const navigation = useNavigation();
 
     useEffect(() => {
-        if (permissionGranted) {
+        if (audioFiles.length > 0) {
             setLoading(false);
         }
     }, [audioFiles]);
@@ -28,15 +25,17 @@ const PlaylistScreen = ({ activeIndex, onSelectAudio }: PlaylistScreenProps) => 
             ) : (
                 <FlatList
                     data={audioFiles}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.audioItem} onPress={() => onSelectAudio(item)}>
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item, index }) => (
+                        <TouchableOpacity
+                            style={styles.audioItem}
+                            onPress={() => navigation.navigate("Player", { trackIndex: index })}
+                        >
                             <Text style={styles.audioTitle}>{item.filename}</Text>
                         </TouchableOpacity>
                     )}
                 />
             )}
-
             {/* Indicateurs de Navigation */}
             <View style={styles.pagination}>
                 <View style={[styles.paginationDot, activeIndex === 0 ? styles.inactiveDot : styles.inactiveDot]} />
@@ -51,30 +50,30 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#000",
-        padding: 20,
+        padding: 20
     },
     title: {
         fontSize: 24,
         fontWeight: "bold",
         color: "#FFD700",
         marginBottom: 20,
-        textAlign: "center",
+        textAlign: "center"
     },
     noMusicText: {
         color: "#b3b3b3",
         fontSize: 16,
         textAlign: "center",
-        marginTop: 20,
+        marginTop: 20
     },
     audioItem: {
         backgroundColor: "#222",
         padding: 15,
         marginVertical: 8,
-        borderRadius: 8,
+        borderRadius: 8
     },
     audioTitle: {
         color: "#FFF",
-        fontSize: 16,
+        fontSize: 16
     },
     pagination: {
         position: "absolute",
@@ -82,21 +81,21 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        width: "100%",
+        width: "100%"
     },
     paginationDot: {
         width: 12,
         height: 12,
         borderRadius: 6,
-        marginHorizontal: 5,
+        marginHorizontal: 5
     },
     activeDot: {
         backgroundColor: "#FFD700",
         width: 14,
-        height: 14,
+        height: 14
     },
     inactiveDot: {
-        backgroundColor: "#fff",
+        backgroundColor: "#fff"
     },
 });
 

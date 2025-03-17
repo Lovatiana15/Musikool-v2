@@ -4,6 +4,7 @@ import Slider from "@react-native-community/slider";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import { AudioContext } from "../context/AudioContext";
+import { useRoute } from "@react-navigation/native";
 
 interface PlayerScreenProps {
     activeIndex: number;
@@ -11,20 +12,23 @@ interface PlayerScreenProps {
 
 const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {
     const { audioFiles } = useContext(AudioContext);
+    const route = useRoute();
+    const initialTrackIndex = route.params?.trackIndex || 0;
+
     const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(1);
-    const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+    const [currentTrackIndex, setCurrentTrackIndex] = useState(initialTrackIndex);
 
     useEffect(() => {
-        loadAndPlayAudio(currentTrackIndex);
+        loadAndPlayAudio(initialTrackIndex);
         return () => {
             if (sound) {
                 sound.unloadAsync();
             }
         };
-    }, []);
+    }, [initialTrackIndex]);
 
     const loadAndPlayAudio = async (index: number) => {
         if (audioFiles.length === 0) return;
@@ -134,6 +138,7 @@ const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {
                 </TouchableOpacity>
             </View>
 
+            {/* Indicateur de navigation  */}
             <View style={styles.pagination}>
                 <View style={[styles.paginationDot, activeIndex === 0 ? styles.activeDot : styles.inactiveDot]} />
                 <View style={[styles.paginationDot, activeIndex === 1 ? styles.activeDot : styles.inactiveDot]} />
