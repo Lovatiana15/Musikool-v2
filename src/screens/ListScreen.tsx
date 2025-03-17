@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, TextInput } from "react-native";
 import { AudioContext } from "../context/AudioContext";
 import { useNavigation } from "@react-navigation/native";
+import Ionicons from "react-native-vector-icons/Ionicons"; // Importer Ionicons
 
 interface PlaylistScreenProps {
     activeIndex?: number;
@@ -36,14 +37,17 @@ const ListScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
         <View style={styles.container}>
             <Text style={styles.title}>🎶 Local Music</Text>
 
-            {/* Champ de Recherche */}
-            <TextInput
-                style={styles.searchInput}
-                placeholder="Search Songs..."
-                placeholderTextColor="#b3b3b3"
-                value={searchText}
-                onChangeText={setSearchText} // Mettre à jour l'état du texte de recherche
-            />
+            {/* Champ de Recherche avec une icône de recherche */}
+            <View style={styles.searchContainer}>
+                <Ionicons name="search" size={20} color="#b3b3b3" style={styles.searchIcon} />
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search Songs..."
+                    placeholderTextColor="#b3b3b3"
+                    value={searchText}
+                    onChangeText={setSearchText} // Mettre à jour l'état du texte de recherche
+                />
+            </View>
 
             {loading ? (
                 <ActivityIndicator size="large" color="#FFD700" />
@@ -64,12 +68,7 @@ const ListScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
                 />
             )}
 
-            {/* Indicateurs de Navigation */}
-            <View style={styles.pagination}>
-                <View style={[styles.paginationDot, activeIndex === 0 ? styles.inactiveDot : styles.inactiveDot]} />
-                <View style={[styles.paginationDot, activeIndex === 1 ? styles.activeDot : styles.inactiveDot]} />
-                <View style={[styles.paginationDot, activeIndex === 2 ? styles.inactiveDot : styles.inactiveDot]} />
-            </View>
+            
         </View>
     );
 };
@@ -87,15 +86,24 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: "center"
     },
-    searchInput: {
+    searchContainer: {
+        flexDirection: "row",
+        alignItems: "center",
         width: "85%",
         height: 50,
         backgroundColor: "#fff",
         borderRadius: 25,
-        paddingLeft: 20,
+        marginBottom: 20, // Ajouter un espacement pour le champ de recherche
+    },
+    searchIcon: {
+        marginLeft: 15, // Espacement à gauche de l'icône
+    },
+    searchInput: {
+        flex: 1, // Laisser le TextInput occuper l'espace restant
+        height: "100%",
         fontSize: 16,
         color: "#000",
-        marginBottom: 20, // Ajouter un espacement pour le champ de recherche
+        paddingLeft: 10, // Espacement à gauche du texte
     },
     noMusicText: {
         color: "#b3b3b3",

@@ -80,7 +80,7 @@ const PlaylistDetailScreen = () => {
 
   // Fonction pour naviguer vers l'écran d'ajout de chanson
   const navigateToAddSong = () => {
-    setShowAddSong(true); 
+    setShowAddSong(false); 
     navigation.navigate('AddSongScreen'); 
   };
 

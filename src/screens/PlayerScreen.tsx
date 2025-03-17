@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import Slider from "@react-native-community/slider";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import { AudioContext } from "../context/AudioContext";
 import { useRoute } from "@react-navigation/native";
+
+import coverImage from '../assets/images/cover_image.jpg'; 
 
 interface PlayerScreenProps {
     activeIndex?: number;
@@ -20,6 +22,9 @@ const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(1);
     const [currentTrackIndex, setCurrentTrackIndex] = useState(initialTrackIndex);
+
+    // Gestion des favoris
+    const [favorites, setFavorites] = useState<number[]>([]); // Tableau d'index de chansons favorites
 
     useEffect(() => {
         loadAndPlayAudio(initialTrackIndex);
@@ -103,8 +108,25 @@ const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {
         }
     };
 
+    // Fonction pour ajouter ou enlever un favori
+    const toggleFavorite = () => {
+        setFavorites((prevFavorites) => {
+            if (prevFavorites.includes(currentTrackIndex)) {
+                return prevFavorites.filter((index) => index !== currentTrackIndex);
+            } else {
+                return [...prevFavorites, currentTrackIndex];
+            }
+        });
+    };
+
     return (
         <View style={styles.container}>
+            {/* Image de couverture de la chanson */}
+            <Image
+                source={coverImage} // Local image
+                style={styles.coverImage}
+            />
+
             <Text style={styles.title}>{audioFiles[currentTrackIndex]?.filename || "No Track"}</Text>
             <Text style={styles.artist}>Unknown Artist</Text>
 
@@ -138,12 +160,14 @@ const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {
                 </TouchableOpacity>
             </View>
 
-            {/* Indicateur de navigation  */}
-            <View style={styles.pagination}>
-                <View style={[styles.paginationDot, activeIndex === 0 ? styles.activeDot : styles.inactiveDot]} />
-                <View style={[styles.paginationDot, activeIndex === 1 ? styles.activeDot : styles.inactiveDot]} />
-                <View style={[styles.paginationDot, activeIndex === 2 ? styles.activeDot : styles.inactiveDot]} />
-            </View>
+            {/* Icone des favoris */}
+            <TouchableOpacity onPress={toggleFavorite} style={styles.favoriteButton}>
+                <Ionicons
+                    name={favorites.includes(currentTrackIndex) ? "heart" : "heart-outline"}
+                    size={30}
+                    color="#FFD700"
+                />
+            </TouchableOpacity>
         </View>
     );
 };
@@ -161,6 +185,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: 20,
+    },
+    coverImage: {
+        width: "100%",
+        height: 200,
+        borderRadius: 10,
+        marginBottom: 30,
     },
     title: {
         fontSize: 24,
@@ -215,6 +245,11 @@ const styles = StyleSheet.create({
     },
     inactiveDot: {
         backgroundColor: "#fff",
+    },
+    favoriteButton: {
+        position: 'absolute',
+        bottom: 230,
+        right: 20,
     },
 });
 

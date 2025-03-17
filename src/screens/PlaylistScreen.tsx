@@ -62,15 +62,15 @@ const PlaylistScreen = () => {
               onChangeText={setNewPlaylistName}
             />
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.modalButton} onPress={addNewPlaylist}>
-                <Text style={styles.modalButtonText}>Créer</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.modalButtonText}>Annuler</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.modalButton, styles.cancelButton]}
+                    onPress={() => setModalVisible(false)}
+                >
+                    <Text style={styles.modalButtonText}>Annuler</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={addNewPlaylist}>
+                    <Text style={styles.modalButtonText}>Créer</Text>
+                </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: "#1E90FF",
+    backgroundColor: "gray",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
