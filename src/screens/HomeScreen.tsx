@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 interface HomeScreenProps {
-    activeIndex: number;
+    activeIndex?: number;
 }
 export default function HomeScreen({ activeIndex }: HomeScreenProps) {
     return (
@@ -11,14 +11,6 @@ export default function HomeScreen({ activeIndex }: HomeScreenProps) {
                 <Text style={styles.title}>Find Your Music</Text>
                 <Text style={styles.description}>Explore your favorite music, artists, and playlists.</Text>
             </View>
-
-            {/* Champ de Recherche */}
-            <TextInput
-                style={styles.searchInput}
-                placeholder="Artist, Song or Playlist..."
-                placeholderTextColor="#b3b3b3"
-            />
-
             {/* Section des Boutons Circulaires */}
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity style={[styles.button, styles.newSong]}>
