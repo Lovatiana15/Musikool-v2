@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, TextInput } from "react-native";
 import { AudioContext } from "../context/AudioContext";
 import { useNavigation } from "@react-navigation/native";
-import Ionicons from "react-native-vector-icons/Ionicons"; // Importer Ionicons
+import { Ionicons } from '@expo/vector-icons';
 
 interface PlaylistScreenProps {
     activeIndex?: number;
@@ -35,7 +35,7 @@ const ListScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>🎶 Local Music</Text>
+            <Text style={styles.title}> Local Music</Text>
 
             {/* Champ de Recherche avec une icône de recherche */}
             <View style={styles.searchContainer}>
@@ -62,6 +62,7 @@ const ListScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
                             style={styles.audioItem}
                             onPress={() => navigation.navigate("Player", { trackIndex: index })}
                         >
+                            <Ionicons name="musical-note" size={20} color="#b3b3b3" />
                             <Text style={styles.audioTitle}>{item.filename}</Text>
                         </TouchableOpacity>
                     )}
@@ -113,9 +114,12 @@ const styles = StyleSheet.create({
     },
     audioItem: {
         backgroundColor: "#222",
-        padding: 15,
-        marginVertical: 8,
-        borderRadius: 8
+        padding: 20,
+        marginVertical: 4,
+        borderRadius: 8,
+        display:"flex",
+        flexDirection:"row",
+        gap: 8,
     },
     audioTitle: {
         color: "#FFF",

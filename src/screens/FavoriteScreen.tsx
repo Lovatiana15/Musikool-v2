@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function FavoriteScreen() {
   const [favoriteTracks, setFavoriteTracks] = useState<any[]>([]);
@@ -26,18 +27,34 @@ export default function FavoriteScreen() {
     }, [])
   );
 
+  // Fonction pour supprimer un favori et mettre à jour AsyncStorage
+  const removeFavorite = async (id: string) => {
+    try {
+      const updatedFavorites = favoriteTracks.filter(item => item.id !== id);
+      setFavoriteTracks(updatedFavorites);
+      await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+    } catch (error) {
+      console.log("Erreur lors de la suppression du favori :", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Mes Favoris</Text>
+      <Text style={styles.title}>My Favorite</Text>
       {favoriteTracks.length === 0 ? (
         <Text style={styles.emptyText}>Aucun favori ajouté.</Text>
       ) : (
         <FlatList
           data={favoriteTracks}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(item, index) =>
+            item.id ? item.id.toString() : index.toString()
+          }
           renderItem={({ item }) => (
             <View style={styles.trackItem}>
               <Text style={styles.trackText}>{item.filename}</Text>
+              <TouchableOpacity onPress={() => removeFavorite(item.id)}>
+                <Ionicons name="trash-bin" size={20} color="red" />
+              </TouchableOpacity>
             </View>
           )}
         />
