@@ -9,17 +9,6 @@ import { PlaylistProvider } from "./src/context/PlaylistContext";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-<<<<<<< HEAD
-    return (
-        <AudioProvider>
-            <PlaylistProvider>
-                <NavigationContainer>
-                    <AppNavigator />
-                </NavigationContainer>
-            </PlaylistProvider>
-        </AudioProvider>
-    );
-=======
   useEffect(() => {
     const prepareApp = async () => {
       try {
@@ -43,5 +32,4 @@ export default function App() {
       </PlaylistProvider>
     </AudioProvider>
   );
->>>>>>> 24c9bdc53cdbc1287681a810894766d6b52b9f7a
 }
