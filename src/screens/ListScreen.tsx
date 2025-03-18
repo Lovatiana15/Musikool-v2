@@ -1,23 +1,45 @@
 import React, { useEffect, useContext, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, TextInput } from "react-native";
+import { 
+    View, 
+    Text, 
+    FlatList, 
+    TouchableOpacity, 
+    StyleSheet, 
+    ActivityIndicator, 
+    TextInput 
+} from "react-native";
 import { AudioContext } from "../context/AudioContext";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
+import { StackNavigationProp } from "@react-navigation/stack";
 
-interface PlaylistScreenProps {
-    activeIndex?: number;
+type RootStackParamList = {
+    Player: { trackIndex: number };
+};
+
+type NavigationProps = StackNavigationProp<RootStackParamList, "Player">;
+
+interface AudioFile {
+    filename: string;
 }
 
-const ListScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
-    const { audioFiles } = useContext(AudioContext);
+interface AudioContextType {
+    audioFiles: AudioFile[];
+}
+
+const ListScreen: React.FC = () => {
+    const context = useContext<AudioContextType | undefined>(AudioContext);
+    const audioFiles = context?.audioFiles || [];
+    
     const [loading, setLoading] = useState(true);
-    const [searchText, setSearchText] = useState(""); // Etat pour le texte de recherche
-    const [filteredAudioFiles, setFilteredAudioFiles] = useState(audioFiles); // Etat pour les fichiers audio filtrés
-    const navigation = useNavigation();
+    const [searchText, setSearchText] = useState(""); 
+    const [filteredAudioFiles, setFilteredAudioFiles] = useState<AudioFile[]>(audioFiles); 
+    const navigation = useNavigation<NavigationProps>();
 
     useEffect(() => {
         if (audioFiles.length > 0) {
             setLoading(false);
+            setFilteredAudioFiles(audioFiles);
         }
     }, [audioFiles]);
 
@@ -26,7 +48,7 @@ const ListScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
         if (searchText === "") {
             setFilteredAudioFiles(audioFiles);
         } else {
-            const filtered = audioFiles.filter(item =>
+            const filtered = audioFiles.filter((item: AudioFile) =>
                 item.filename.toLowerCase().includes(searchText.toLowerCase())
             );
             setFilteredAudioFiles(filtered);
@@ -45,7 +67,7 @@ const ListScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
                     placeholder="Search Songs..."
                     placeholderTextColor="#b3b3b3"
                     value={searchText}
-                    onChangeText={setSearchText} // Mettre à jour l'état du texte de recherche
+                    onChangeText={setSearchText} 
                 />
             </View>
 
@@ -68,8 +90,6 @@ const ListScreen: React.FC<PlaylistScreenProps> = ({ activeIndex }) => {
                     )}
                 />
             )}
-
-            
         </View>
     );
 };
@@ -94,17 +114,17 @@ const styles = StyleSheet.create({
         height: 50,
         backgroundColor: "#fff",
         borderRadius: 25,
-        marginBottom: 20, // Ajouter un espacement pour le champ de recherche
+        marginBottom: 20,
     },
     searchIcon: {
-        marginLeft: 15, // Espacement à gauche de l'icône
+        marginLeft: 15,
     },
     searchInput: {
-        flex: 1, // Laisser le TextInput occuper l'espace restant
+        flex: 1,
         height: "100%",
         fontSize: 16,
         color: "#000",
-        paddingLeft: 10, // Espacement à gauche du texte
+        paddingLeft: 10,
     },
     noMusicText: {
         color: "#b3b3b3",
@@ -117,8 +137,7 @@ const styles = StyleSheet.create({
         padding: 20,
         marginVertical: 4,
         borderRadius: 8,
-        display:"flex",
-        flexDirection:"row",
+        flexDirection: "row",
         gap: 8,
     },
     audioTitle: {
