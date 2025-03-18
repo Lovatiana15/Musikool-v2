@@ -1,6 +1,6 @@
 import React from "react";
 import { View } from "react-native";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from "../screens/HomeScreen";
 import ListScreen from "../screens/ListScreen";
@@ -8,7 +8,7 @@ import PlayerScreen from "../screens/PlayerScreen";
 import PlaylistScreen from "../screens/PlaylistScreen";
 import FavoriteScreen from "../screens/FavoriteScreen";
 
-const Tab = createMaterialTopTabNavigator();
+const Tab = createBottomTabNavigator();
 
 export default function TabLayout() {
   return (
@@ -18,6 +18,7 @@ export default function TabLayout() {
           tabBarStyle: { backgroundColor: "gray" },
           tabBarLabelStyle: { color: "white", fontSize: 12 },
           tabBarIndicatorStyle: { backgroundColor: "yellow", height: 3 },
+          tabBarInactiveTintColor: "white",
         }}
       >
         <Tab.Screen
