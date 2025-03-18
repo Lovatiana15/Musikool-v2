@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TextInput } from "react-native";
 import { usePlaylist } from "../context/PlaylistContext";
 import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../utils/types"; 
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const PlaylistScreen = () => {
   const { playlists, setPlaylists } = usePlaylist();
   const [modalVisible, setModalVisible] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState("");
-  const navigation = useNavigation();
+  
+  // Typage de la navigation
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const addNewPlaylist = () => {
     if (newPlaylistName.trim() === "") return;
@@ -26,6 +30,7 @@ const PlaylistScreen = () => {
   };
 
   const openPlaylist = (playlist: any) => {
+    // Mise à jour pour utiliser les types
     navigation.navigate("PlaylistDetail", { playlistId: playlist.id });
   };
 

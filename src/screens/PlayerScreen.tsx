@@ -7,7 +7,11 @@ import { AudioContext } from "../context/AudioContext";
 import { useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import coverImage from '../assets/images/cover_image.jpg';
+const coverImage = require("../assets/images/cover_image.jpg");
+
+// Définition manuelle des constantes si elles ne sont plus exportées par expo-av
+const INTERRUPTION_MODE_IOS_DO_NOT_MIX = 1;
+const INTERRUPTION_MODE_ANDROID_DO_NOT_MIX = 1;
 
 interface PlayerScreenProps {
   activeIndex?: number;
@@ -23,13 +27,30 @@ const PlayerScreen = ({ activeIndex }: PlayerScreenProps) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(1);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(initialTrackIndex);
-
-  // État des favoris (tableau d'objets chanson)
   const [favorites, setFavorites] = useState<any[]>([]);
+
+  // Configure le mode audio pour continuer en arrière-plan (Android)
+  useEffect(() => {
+    async function setAudioMode() {
+      try {
+        await Audio.setAudioModeAsync({
+          staysActiveInBackground: true,
+          playsInSilentModeIOS: true,
+          interruptionModeIOS: INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+          shouldDuckAndroid: false,
+          interruptionModeAndroid: INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+          playThroughEarpieceAndroid: false,
+        });
+      } catch (error) {
+        console.log("Erreur lors de la configuration du mode audio :", error);
+      }
+    }
+    setAudioMode();
+  }, []);
 
   useEffect(() => {
     loadAndPlayAudio(initialTrackIndex);
-    loadFavorites(); // Charge les favoris au démarrage
+    loadFavorites();
     return () => {
       if (sound) {
         sound.unloadAsync();
