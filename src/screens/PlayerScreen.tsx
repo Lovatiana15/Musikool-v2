@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   artist: {
     fontSize: 18,
     color: "white",
-    marginBottom: 30,
+    marginBottom: 10,
   },
   timeContainer: {
     flexDirection: "row",
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   slider: {
     width: "80%",
     height: 40,
-    marginBottom: 30,
+    marginBottom: 10,
   },
   controls: {
     flexDirection: "row",
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
   favoriteButton: {
     position: "absolute",
-    bottom: 230,
+    bottom: 200,
     right: 20,
   },
 });

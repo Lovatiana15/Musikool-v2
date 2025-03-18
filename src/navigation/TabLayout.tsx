@@ -1,7 +1,7 @@
 import React from "react";
-import { View } from "react-native";
+import { View, Text, Image } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/HomeScreen";
 import ListScreen from "../screens/ListScreen";
 import PlayerScreen from "../screens/PlayerScreen";
@@ -10,15 +10,34 @@ import FavoriteScreen from "../screens/FavoriteScreen";
 
 const Tab = createBottomTabNavigator();
 
+function CustomHeader() {
+  return (
+    <View style={{
+      backgroundColor: "black",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      gap:8
+    }}>
+      <Image
+        source={require("../assets/images/icon.png")}
+        style={{ width: 30, height: 30 }}
+      />
+      <Text style={{ fontSize: 18, fontWeight: "bold", color: "yellow", marginRight: 10 }}>Musi<Text style={{color:"white"}}>kool</Text></Text>
+    </View>
+  );
+}
+
 export default function TabLayout() {
   return (
-    <View style={{ flex: 1 , marginTop:25}}>
+    <View style={{ flex: 1 ,marginTop:25}}>
       <Tab.Navigator
         screenOptions={{
-          tabBarStyle: { backgroundColor: "gray" },
+          tabBarStyle: { backgroundColor: "gray", height: 50 },
           tabBarLabelStyle: { color: "white", fontSize: 12 },
-          tabBarIndicatorStyle: { backgroundColor: "yellow", height: 3 },
           tabBarInactiveTintColor: "white",
+          headerTitle: () => <CustomHeader />,
+          headerStyle: { backgroundColor: "black" },
         }}
       >
         <Tab.Screen
@@ -29,7 +48,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={25} color={color} />,
           }}
         />
-        
+
         <Tab.Screen
           name="List"
           component={ListScreen}
